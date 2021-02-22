@@ -47,17 +47,6 @@ Status of This Memo
    working documents as Internet-Drafts.  The list of current Internet-
    Drafts is at https://datatracker.ietf.org/drafts/current/.
 
-
-
-
-
-
-
-Frindell, et al.         Expires 26 August 2021                 [Page 1]
-
-Internet-Draft               WebTransport-H2               February 2021
-
-
    Internet-Drafts are draft documents valid for a maximum of six months
    and may be updated, replaced, or obsoleted by other documents at any
    time.  It is inappropriate to use Internet-Drafts as reference
@@ -81,38 +70,30 @@ Copyright Notice
 
 Table of Contents
 
-   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
-     1.1.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   3
-   2.  Protocol Overview . . . . . . . . . . . . . . . . . . . . . .   3
-   3.  Session Establishment . . . . . . . . . . . . . . . . . . . .   4
-     3.1.  Establishing a Transport-Capable HTTP/2 Connection  . . .   4
-     3.2.  Extended CONNECT in HTTP/2  . . . . . . . . . . . . . . .   4
-     3.3.  Creating a New Session  . . . . . . . . . . . . . . . . .   4
-     3.4.  Limiting the Number of Simultaneous Sessions  . . . . . .   5
-   4.  WebTransport Features . . . . . . . . . . . . . . . . . . . .   5
-     4.1.  WT_STREAM Frame . . . . . . . . . . . . . . . . . . . . .   6
-     4.2.  WT_DATAGRAM Frame . . . . . . . . . . . . . . . . . . . .   7
-   5.  Session Termination . . . . . . . . . . . . . . . . . . . . .   8
-   6.  Transport Properties  . . . . . . . . . . . . . . . . . . . .   8
-   7.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
-   8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
-     8.1.  HTTP/2 SETTINGS Parameter Registration  . . . . . . . . .   9
-     8.2.  Frame Type Registration . . . . . . . . . . . . . . . . .   9
-     8.3.  HTTP/2 Error Code Registry  . . . . . . . . . . . . . . .  10
-     8.4.  Examples  . . . . . . . . . . . . . . . . . . . . . . . .  10
-   9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  12
-     9.1.  Normative References  . . . . . . . . . . . . . . . . . .  12
-     9.2.  Informative References  . . . . . . . . . . . . . . . . .  13
-   Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . .  14
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  14
-
-
-
-
-Frindell, et al.         Expires 26 August 2021                 [Page 2]
-
-Internet-Draft               WebTransport-H2               February 2021
-
+   1.  Introduction
+     1.1.  Terminology
+   2.  Protocol Overview
+   3.  Session Establishment
+     3.1.  Establishing a Transport-Capable HTTP/2 Connection
+     3.2.  Extended CONNECT in HTTP/2
+     3.3.  Creating a New Session
+     3.4.  Limiting the Number of Simultaneous Sessions
+   4.  WebTransport Features
+     4.1.  WT_STREAM Frame
+     4.2.  WT_DATAGRAM Frame
+   5.  Session Termination
+   6.  Transport Properties
+   7.  Security Considerations
+   8.  IANA Considerations
+     8.1.  HTTP/2 SETTINGS Parameter Registration
+     8.2.  Frame Type Registration
+     8.3.  HTTP/2 Error Code Registry
+     8.4.  Examples
+   9.  References
+     9.1.  Normative References
+     9.2.  Informative References
+   Acknowledgments
+   Authors' Addresses
 
 1.  Introduction
 
@@ -163,13 +144,6 @@ Internet-Draft               WebTransport-H2               February 2021
    have to send a SETTINGS_ENABLE_WEBTRANSPORT setting in order to
    indicate that they both support WebTransport over HTTP/2.
 
-
-
-Frindell, et al.         Expires 26 August 2021                 [Page 3]
-
-Internet-Draft               WebTransport-H2               February 2021
-
-
    WebTransport sessions are initiated inside a given HTTP/2 connection
    by the client, who sends an extended CONNECT request [RFC8441].  If
    the server accepts the request, an WebTransport session is
@@ -218,14 +192,6 @@ Internet-Draft               WebTransport-H2               February 2021
    HTTP CONNECT request.  The ":protocol" pseudo-header field
    ([RFC8441]) MUST be set to "webtransport" (Section 7.1
    [WEBTRANSPORT-H3]).  The ":scheme" field MUST be "https".  Both the
-
-
-
-Frindell, et al.         Expires 26 August 2021                 [Page 4]
-
-Internet-Draft               WebTransport-H2               February 2021
-
-
    ":authority" and the ":path" value MUST be set; those fields indicate
    the desired WebTransport server.  An "Origin" header [RFC6454] MUST
    be provided within the request.
@@ -273,15 +239,6 @@ Internet-Draft               WebTransport-H2               February 2021
    to different WebTransport sessions.  On the wire, session IDs are
    encoded using a 31-bit integer field.
 
-
-
-
-
-Frindell, et al.         Expires 26 August 2021                 [Page 5]
-
-Internet-Draft               WebTransport-H2               February 2021
-
-
 4.1.  WT_STREAM Frame
 
    A new HTTP/2 frame called WT_STREAM is introduced for either endpoint
@@ -327,16 +284,6 @@ Internet-Draft               WebTransport-H2               February 2021
    exist, is not a stream established via extended CONNECT to use the
    "webtransport" protocol, or if it is in the "closed" or "half-closed
    (remote)" stream state.
-
-
-
-
-
-
-Frindell, et al.         Expires 26 August 2021                 [Page 6]
-
-Internet-Draft               WebTransport-H2               February 2021
-
 
 4.2.  WT_DATAGRAM Frame
 
@@ -385,15 +332,6 @@ Internet-Draft               WebTransport-H2               February 2021
    receiver MAY discard this data if it does not have sufficient space
    to buffer it.
 
-
-
-
-
-Frindell, et al.         Expires 26 August 2021                 [Page 7]
-
-Internet-Draft               WebTransport-H2               February 2021
-
-
    An intermediary could forward the data in a WT_DATAGRAM frame over
    another protocol, such as WebTransport over HTTP/3.  In QUIC, a
    datagram frame can span at most one packet.  Because of that, the
@@ -437,18 +375,6 @@ Internet-Draft               WebTransport-H2               February 2021
       multipath or migration, such as MPTCP [RFC7540], is used
       underneath HTTP/2 and TLS.  Without such support, Http2Transport
       connections cannot survive network transitions.
-
-
-
-
-
-
-
-
-Frindell, et al.         Expires 26 August 2021                 [Page 8]
-
-Internet-Draft               WebTransport-H2               February 2021
-
 
 7.  Security Considerations
 
@@ -499,13 +425,6 @@ Internet-Draft               WebTransport-H2               February 2021
    The following entries are added to the "HTTP/2 Frame Type" registry
    established by [RFC7540]:
 
-
-
-Frindell, et al.         Expires 26 August 2021                 [Page 9]
-
-Internet-Draft               WebTransport-H2               February 2021
-
-
    The "WT_STREAM" frame allows HTTP/2 client- and server-initiated
    unidirectional and bidirectional streams to be used by WebTransport:
 
@@ -544,23 +463,6 @@ Internet-Draft               WebTransport-H2               February 2021
    connection follows.  This example is intended to closely follow the
    example in Section 5.1 of [RFC8441] to help illustrate the
    differences defined in this document.
-
-
-
-
-
-
-
-
-
-
-
-
-
-Frindell, et al.         Expires 26 August 2021                [Page 10]
-
-Internet-Draft               WebTransport-H2               February 2021
-
 
    [[ From Client ]]                   [[ From Server ]]
 
@@ -604,20 +506,6 @@ Internet-Draft               WebTransport-H2               February 2021
    The only difference here is the endpoint that sends the first
    WT_STREAM frame.
 
-
-
-
-
-
-
-
-
-
-Frindell, et al.         Expires 26 August 2021                [Page 11]
-
-Internet-Draft               WebTransport-H2               February 2021
-
-
    [[ From Client ]]                   [[ From Server ]]
 
    SETTINGS
@@ -660,81 +548,63 @@ Internet-Draft               WebTransport-H2               February 2021
 
    [OVERVIEW] Vasiliev, V., "The WebTransport Protocol Framework", Work
               in Progress, Internet-Draft, draft-ietf-webtrans-overview-
-              latest, <https://tools.ietf.org/html/draft-ietf-webtrans-
-              overview-latest>.
-
-
-
-
-
-
-
-Frindell, et al.         Expires 26 August 2021                [Page 12]
-
-Internet-Draft               WebTransport-H2               February 2021
-
+              latest, <https://datatracker.ietf.org/doc/html/draft-ietf-
+              webtrans-overview-latest.txt>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
               DOI 10.17487/RFC2119, March 1997,
-              <https://www.rfc-editor.org/info/rfc2119>.
+              <https://datatracker.ietf.org/doc/html/rfc2119>.
 
    [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
               Resource Identifier (URI): Generic Syntax", STD 66,
               RFC 3986, DOI 10.17487/RFC3986, January 2005,
-              <https://www.rfc-editor.org/info/rfc3986>.
+              <https://datatracker.ietf.org/doc/html/rfc3986>.
 
    [RFC6454]  Barth, A., "The Web Origin Concept", RFC 6454,
               DOI 10.17487/RFC6454, December 2011,
-              <https://www.rfc-editor.org/info/rfc6454>.
+              <https://datatracker.ietf.org/doc/html/rfc6454>.
 
    [RFC6585]  Nottingham, M. and R. Fielding, "Additional HTTP Status
               Codes", RFC 6585, DOI 10.17487/RFC6585, April 2012,
-              <https://www.rfc-editor.org/info/rfc6585>.
+              <https://datatracker.ietf.org/doc/html/rfc6585>.
 
    [RFC7230]  Fielding, R., Ed. and J. Reschke, Ed., "Hypertext Transfer
               Protocol (HTTP/1.1): Message Syntax and Routing",
               RFC 7230, DOI 10.17487/RFC7230, June 2014,
-              <https://www.rfc-editor.org/info/rfc7230>.
+              <https://datatracker.ietf.org/doc/html/rfc7230>.
 
    [RFC7231]  Fielding, R., Ed. and J. Reschke, Ed., "Hypertext Transfer
               Protocol (HTTP/1.1): Semantics and Content", RFC 7231,
               DOI 10.17487/RFC7231, June 2014,
-              <https://www.rfc-editor.org/info/rfc7231>.
+              <https://datatracker.ietf.org/doc/html/rfc7231>.
 
    [RFC7540]  Belshe, M., Peon, R., and M. Thomson, Ed., "Hypertext
               Transfer Protocol Version 2 (HTTP/2)", RFC 7540,
               DOI 10.17487/RFC7540, May 2015,
-              <https://www.rfc-editor.org/info/rfc7540>.
+              <https://datatracker.ietf.org/doc/html/rfc7540>.
 
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
-              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+              May 2017, <https://datatracker.ietf.org/doc/html/rfc8174>.
 
    [RFC8441]  McManus, P., "Bootstrapping WebSockets with HTTP/2",
               RFC 8441, DOI 10.17487/RFC8441, September 2018,
-              <https://www.rfc-editor.org/info/rfc8441>.
+              <https://datatracker.ietf.org/doc/html/rfc8441>.
 
    [WEBTRANSPORT-H3]
               Vasiliev, V., "WebTransport over HTTP/3", Work in
               Progress, Internet-Draft, draft-ietf-webtrans-
-              http3-latest, <https://tools.ietf.org/html/draft-ietf-
-              webtrans-http3-latest>.
+              http3-latest, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-webtrans-http3-latest.txt>.
 
 9.2.  Informative References
-
-
-
-Frindell, et al.         Expires 26 August 2021                [Page 13]
-
-Internet-Draft               WebTransport-H2               February 2021
-
 
    [RFC6202]  Loreto, S., Saint-Andre, P., Salsano, S., and G. Wilkins,
               "Known Issues and Best Practices for the Use of Long
               Polling and Streaming in Bidirectional HTTP", RFC 6202,
               DOI 10.17487/RFC6202, April 2011,
-              <https://www.rfc-editor.org/info/rfc6202>.
+              <https://datatracker.ietf.org/doc/html/rfc6202>.
 
 Acknowledgments
 
@@ -777,8 +647,3 @@ Authors' Addresses
    Facebook Inc.
 
    Email: woo@fb.com
-
-
-
-
-Frindell, et al.         Expires 26 August 2021                [Page 14]
