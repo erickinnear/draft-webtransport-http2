@@ -1,0 +1,1331 @@
+{
+  "magic": "E!vIA5L86J2I",
+  "timestamp": "2021-02-23T00:35:19.598881+00:00",
+  "repo": "ekinnear/draft-webtransport-http2",
+  "labels": [
+    {
+      "name": "bug",
+      "description": "Something isn't working",
+      "color": "d73a4a"
+    },
+    {
+      "name": "documentation",
+      "description": "Improvements or additions to documentation",
+      "color": "0075ca"
+    },
+    {
+      "name": "duplicate",
+      "description": "This issue or pull request already exists",
+      "color": "cfd3d7"
+    },
+    {
+      "name": "enhancement",
+      "description": "New feature or request",
+      "color": "a2eeef"
+    },
+    {
+      "name": "help wanted",
+      "description": "Extra attention is needed",
+      "color": "008672"
+    },
+    {
+      "name": "good first issue",
+      "description": "Good for newcomers",
+      "color": "7057ff"
+    },
+    {
+      "name": "invalid",
+      "description": "This doesn't seem right",
+      "color": "e4e669"
+    },
+    {
+      "name": "question",
+      "description": "Further information is requested",
+      "color": "d876e3"
+    },
+    {
+      "name": "wontfix",
+      "description": "This will not be worked on",
+      "color": "ffffff"
+    }
+  ],
+  "issues": [
+    {
+      "number": 3,
+      "id": "MDU6SXNzdWU2NTYxMjkwNjA=",
+      "title": "Describe how to bring up new WebTransport streams without additional roundtrips",
+      "url": "https://github.com/ekinnear/draft-webtransport-http2/issues/3",
+      "state": "OPEN",
+      "author": "ekinnear",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "The [overview](https://tools.ietf.org/html/draft-vvv-webtransport-overview-01) contains the following text: \r\n```\r\no  Each new stream would require a WebSocket handshake to agree on\r\n      application protocol used, meaning that it would take at least one\r\n      RTT to establish each new stream before the client can write to\r\n      it.\r\n```\r\n\r\nWe should consider documenting how it's possible to send the connect frame and then the next stream, since we can guarantee in-order delivery (and processing?) of the data.\r\n\r\nWe can also note that this is orthogonal to 0-RTT.\r\n```\r\n   In some cases, the transport protocol might allow transmitting data\r\n   before the session is established; an example is TLS 0-RTT data.\r\n   Since this data can be replayed by attackers, it MUST NOT be used\r\n   unless the client has explicitly requested 0-RTT for specific streams\r\n   or datagrams it knows to be safely replayable.\r\n```\r\n",
+      "createdAt": "2020-07-13T20:48:14Z",
+      "updatedAt": "2020-11-15T23:02:35Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "afrind",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Will this only be possible with WT over H2?  \r\n\r\nAn HTTP request can be sent at any time over an existing connection, and it contains both information in the headers sufficient to route it to the proper destination AND potentially payload that can be acted upon as soon as it gets there.  Because these are separate streams in HTTP/3, they could arrive out of order at a proxy, which means sending independently routable messages (which require a session and a stream) from H3 have worse latency than H2.  It's also strange because while the browser to edge hop may be H2, subsequent hops may be H3.",
+          "createdAt": "2020-07-23T22:54:58Z",
+          "updatedAt": "2020-07-23T22:54:58Z"
+        },
+        {
+          "author": "ekinnear",
+          "authorAssociation": "OWNER",
+          "body": "It's possible that this would only work over HTTP/2, which does provide an interesting inversion from the usual benefits that you get from HTTP/3. It would be really nice if these were in a single stream in HTTP/3 as well, but I don't really see that happening if we have CONNECT followed by other streams to which that CONNECT referred.",
+          "createdAt": "2020-11-15T23:02:35Z",
+          "updatedAt": "2020-11-15T23:02:35Z"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "id": "MDU6SXNzdWU2NTYxMjkyMzk=",
+      "title": "Document fulfillment of WebTransport framework requirements",
+      "url": "https://github.com/ekinnear/draft-webtransport-http2/issues/4",
+      "state": "OPEN",
+      "author": "ekinnear",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "We should have a clear section that explains how Http2Transport fulfills the transport protocol requirements from the [WebTransport Overview](https://tools.ietf.org/html/draft-vvv-webtransport-overview-01)\r\n\r\n```\r\n   Any transport protocol used MUST use TLS [RFC8446] or a semantically\r\n   equivalent security protocol (for instance, DTLS\r\n   [I-D.ietf-tls-dtls13]).  The protocols SHOULD use TLS version 1.3 or\r\n   later, unless they aim for backwards compatibility with legacy\r\n   systems.\r\n\r\n   Any transport protocol used MUST require the user agent to obtain and\r\n   maintain explicit consent from the server to send data.  For\r\n   connection-oriented protocols (such as TCP or QUIC), the connection\r\n   establishment and keep-alive mechanisms suffice.  For other\r\n   protocols, a mechanism such as ICE [RFC8445] can be used.\r\n\r\n   Any transport protocol used MUST limit the rate at which the client\r\n   sends data.  This SHOULD be accomplished via a feedback-based\r\n   congestion control mechanism (such as [RFC5681] or\r\n   [I-D.ietf-quic-recovery]).\r\n\r\n   Any transport protocol used MUST support simultaneously establishing\r\n   multiple sessions between the same client and server.\r\n\r\n   Any transport protocol used MUST prevent the clients from\r\n   establishing transport sessions to network endpoints that are not\r\n   WebTransport servers.\r\n\r\n   Any transport protocol used MUST provide a way for servers to filter\r\n   clients that can access it by checking the initiating origin\r\n   [RFC6454].\r\n\r\n   Any transport protocol used MUST provide a way for a server endpoint\r\n   location to be described using a URI [RFC3986].  This enables\r\n   integration with various Web platform features that represent\r\n   resources as URIs, such as Content Security Policy [CSP].\r\n```\r\n",
+      "createdAt": "2020-07-13T20:48:32Z",
+      "updatedAt": "2020-07-13T20:48:32Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 5,
+      "id": "MDU6SXNzdWU2NTYxMjkzODk=",
+      "title": "Explicilty support both unidirectional and bidirectional streams",
+      "url": "https://github.com/ekinnear/draft-webtransport-http2/issues/5",
+      "state": "CLOSED",
+      "author": "ekinnear",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "As in the [WebTransport Overview](https://tools.ietf.org/html/draft-vvv-webtransport-overview-01),\r\n```\r\n   All transport protocols MUST provide datagrams, unidirectional and\r\n   bidirectional streams in order to make the transport protocols easily\r\n   interchangeable.\r\n```\r\nWe should document how we provide a unidirectional stream, likely by adding that as a parameter to the Connect stream.\r\n\r\n",
+      "createdAt": "2020-07-13T20:48:49Z",
+      "updatedAt": "2020-11-15T21:29:13Z",
+      "closedAt": "2020-11-15T21:29:13Z",
+      "comments": []
+    },
+    {
+      "number": 6,
+      "id": "MDU6SXNzdWU2NTYxMjk0OTk=",
+      "title": "Describe datagram usage",
+      "url": "https://github.com/ekinnear/draft-webtransport-http2/issues/6",
+      "state": "OPEN",
+      "author": "ekinnear",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "The [Overview](https://tools.ietf.org/html/draft-vvv-webtransport-overview-01) places requirements on how WebTransport handles datagrams:\r\n\r\n```\r\n   The WebTransport sender is not expected to retransmit datagrams,\r\n   though it may if it is using a TCP-based protocol or some other\r\n   underlying protocol that requires reliable delivery.  WebTransport\r\n   datagrams are not expected to be flow controlled, meaning that the\r\n   receiver might drop datagrams if the application is not consuming\r\n   them fast enough.\r\n```\r\n\r\nWe should describe that Http2Transport is going to retransmit datagrams (being over TCP/TLS/HTTP2) and offer some text about how these interact with flow control.",
+      "createdAt": "2020-07-13T20:49:04Z",
+      "updatedAt": "2020-11-09T23:19:08Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "afrind",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I think the draft also needs to describe what frames will be used to transmit datagrams.  Will that be a new frame type, a single dedicated datagram stream, or a WTHEADERS stream per datagram, etc?",
+          "createdAt": "2020-07-23T22:47:18Z",
+          "updatedAt": "2020-07-23T22:47:18Z"
+        },
+        {
+          "author": "ekinnear",
+          "authorAssociation": "OWNER",
+          "body": "Agreed, thinking through those three options, a new frame time vs. a dedicated datagram stream don't seem to provide significant differences in practical usage. A new WTHEADERS stream per datagram seems a bit heavyweight given that ordering is going to be enforced whether or not we want that. Are there other advantages to doing so which we'd lose if we didn't go that route?\r\n\r\nPutting it in a dedicated datagram stream gives you quite straightforward interactions with flow control and also makes it pretty clear that these are in-order, reliable datagrams regardless of what the application might wish. Haven't thought through all the implications here yet, but it seems like a reasonable approach.\r\n\r\nAre there differences in behavior that a new frame type would have beyond just a new datagram stream?",
+          "createdAt": "2020-07-26T01:42:25Z",
+          "updatedAt": "2020-07-26T01:42:25Z"
+        },
+        {
+          "author": "ekinnear",
+          "authorAssociation": "OWNER",
+          "body": "> quite straightforward interactions with flow control\r\n\r\nAlthough notably, not necessarily what we want, if we want to exempt them from flow control. In theory, as long as we're draining the underlying TLS connection on the other end, that shouldn't be unreasonable since the other endpoint can throw them out if necessary.",
+          "createdAt": "2020-07-26T02:33:21Z",
+          "updatedAt": "2020-07-26T02:33:21Z"
+        },
+        {
+          "author": "afrind",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Here's a strawman for an H2 DATAGRAM frame using the routing stream ID in the frame header:\r\n\r\n```\r\nLength(24) | Type(8) = DATAGRAM | \r\nFlags(8) | \r\nR | Routing Stream ID (31) |\r\nPad Len? (8) | \r\nPayload* |\r\nPadding\r\n```\r\n\r\nQUIC DATAGRAM doesn't mention padding, but doesn't need to since padding is a separate frame, but I assume we'd want it here. \r\n\r\nSomewhat related: do we want to continue using routing stream IDs, or switch to using \"Session IDs\" like h3 webtransport?  I could ask the same question for h3 - since the session is established by a stream, why *not* just use the transport stream ID as the session id?  I have a feeling the answer is \"transport streams in session protocol bad\".  If we expect WebTransport to be easily gatewayed between h2 and h3, we'd probably want h2 to have a mechanism to convey the session ID (both in datagrams and streams)",
+          "createdAt": "2020-11-06T23:18:01Z",
+          "updatedAt": "2020-11-06T23:18:01Z"
+        },
+        {
+          "author": "afrind",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Regarding\r\n\r\n> do we want to continue using routing stream IDs, or switch to using \"Session IDs\" like h3 webtransport? \r\n\r\nLooks like H3 is replacing session ID with stream ID, so we should keep it as is ;)\r\n\r\nhttps://github.com/vasilvv/webtransport/pull/21",
+          "createdAt": "2020-11-09T23:19:08Z",
+          "updatedAt": "2020-11-09T23:19:08Z"
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "id": "MDU6SXNzdWU2NTYxMjk2MjY=",
+      "title": "Provide stream IDs",
+      "url": "https://github.com/ekinnear/draft-webtransport-http2/issues/7",
+      "state": "OPEN",
+      "author": "ekinnear",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "From the [Overview](https://tools.ietf.org/html/draft-vvv-webtransport-overview-01):\r\n\r\n```\r\n   Every stream within a transport has a unique 64-bit number\r\n   identifying it.  Both unidirectional and bidirectional streams share\r\n   the number space.  The client and the server have to agree on the\r\n   numbering, so it can be referenced in the application payload.\r\n   WebTransport does not impose any other specific restrictions on the\r\n   structure of stream IDs, and they should be treated as opaque 64-bit\r\n   blobs.\r\n```\r\n\r\nWe had previously discussed that WebTransport should not be trying to reuse stream IDs that may already be present in the protocols that it's mapped over, since those may not all have the same semantics and we wanted it to be consistent for clients. Make sure that we include explicit stream IDs in our HTTP/2 Transport description as well.",
+      "createdAt": "2020-07-13T20:49:20Z",
+      "updatedAt": "2020-07-13T20:56:35Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "ekinnear",
+          "authorAssociation": "OWNER",
+          "body": "One interesting question here is whether or not we expect the Connect Stream to have a WebTransport Stream ID, since it's not really intended to be used to exchange significant data.",
+          "createdAt": "2020-07-13T20:56:35Z",
+          "updatedAt": "2020-07-13T20:56:35Z"
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "id": "MDU6SXNzdWU2NTYxMjk4Mjg=",
+      "title": "Enumerate the transport properties provided by Http2Transport",
+      "url": "https://github.com/ekinnear/draft-webtransport-http2/issues/8",
+      "state": "CLOSED",
+      "author": "ekinnear",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "ekinnear"
+      ],
+      "labels": [],
+      "body": "From the [Overview](https://tools.ietf.org/html/draft-vvv-webtransport-overview-01):\r\n```\r\n   In addition to common requirements, each transport can have multiple\r\n   optional properties associated with it.  Querying them allows the\r\n   client to ascertain the presence of features it can use without\r\n   requiring knowledge of all protocols.  This allows introducing new\r\n   transports as drop-in replacements for existing ones.\r\n\r\n   The following properties are defined in this specification:\r\n\r\n   o  Stream independence.  This indicates that there is no head of line\r\n      blocking between different streams.\r\n\r\n   o  Partial reliability.  This indicates that if a stream is reset,\r\n      none of the data sent on it will be retransmitted.  This also\r\n      indicates that datagrams will not be retransmitted.\r\n\r\n   o  Pooling support.  Indicates that multiple transports using this\r\n      transport protocol may end up sharing the same transport layer\r\n      connection, and thus share a congestion controller and other\r\n      contexts.\r\n\r\n   o  Connection mobility.  Indicates that the transport may continue\r\n      existing even if the network path between the client and the\r\n      server changes.\r\n```\r\n\r\nWe should enumerate the position that Http2Transport takes on each of these items.\r\n\r\nSpecifically: \r\n\r\n- No stream independence\r\n\r\n- No partial reliability\r\n\r\n- Yes pooling support\r\n\r\n- No connection mobility\r\n",
+      "createdAt": "2020-07-13T20:49:45Z",
+      "updatedAt": "2020-07-13T22:45:26Z",
+      "closedAt": "2020-07-13T22:45:26Z",
+      "comments": []
+    },
+    {
+      "number": 11,
+      "id": "MDU6SXNzdWU2NjQ4MTE2MDc=",
+      "title": "Possible CRIME-like attacks against arbitrary metadata",
+      "url": "https://github.com/ekinnear/draft-webtransport-http2/issues/11",
+      "state": "CLOSED",
+      "author": "afrind",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "If the WebTransport stream API allows sending completely arbitrary metadata, which is then compressed using the same compression context as other streams, it may introduce a CRIME-like attack in any case where an attacker can control the metadata on the WT streams and observe the size of packets transmitted on the network.\r\n\r\nPerhaps this can be mitigated by specially name-spacing any arbitrary meta-data so it doesn't collide with Cookie and other sensitive HTTP headers that might be in the compression context.  Or at the very least, this deserves a mention in the Security Considerations.",
+      "createdAt": "2020-07-23T22:50:47Z",
+      "updatedAt": "2020-11-07T00:45:23Z",
+      "closedAt": "2020-11-07T00:45:23Z",
+      "comments": [
+        {
+          "author": "ekinnear",
+          "authorAssociation": "OWNER",
+          "body": "Very good point! I suspect we should be on the lookout for other potential issues one could encounter when sharing an underlying HTTP/2 connection. That said, would you be allowed to share such a connection in situations where this would be an issue? (Not saying you wouldn't, just thinking the current discussion on the mailing list of how to select eligibility for sharing the underlying transport could be relevant here)",
+          "createdAt": "2020-07-26T02:38:54Z",
+          "updatedAt": "2020-07-26T02:38:54Z"
+        },
+        {
+          "author": "afrind",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I think it must have been too early in the morning at the last IETF.  For CRIME to work, the compression scheme needs to be incremental (eg: if I guess part of your cookie then there are fewer bytes on the wire).  h2 WT would still use HPACK, so the attacker needs to completely guess the cookie to see an observable difference.  Closing for now.",
+          "createdAt": "2020-11-07T00:45:23Z",
+          "updatedAt": "2020-11-07T00:45:23Z"
+        }
+      ]
+    },
+    {
+      "number": 12,
+      "id": "MDU6SXNzdWU2NjQ4MTQxMjQ=",
+      "title": "How to gracefully terminate a session, but not a connection",
+      "url": "https://github.com/ekinnear/draft-webtransport-http2/issues/12",
+      "state": "OPEN",
+      "author": "afrind",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "It's possible that a WebTransport endpoint may wish to drain a session, such that the peer would know not to create new streams on that session, but existing sessions could complete before closing the session's stream.  We need something like GOAWAY, but scoped to a single session.\r\n\r\nThis is useful when there are multiple sessions (and possibly other HTTP traffic) multiplexed on a single connection, which are routed to different upstream servers.  If a single upstream server needs to restart (and gracefully drain), it would be nice to not have to drain all the sessions/traffic from the client's connection.",
+      "createdAt": "2020-07-23T22:58:24Z",
+      "updatedAt": "2020-07-26T02:40:55Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "ekinnear",
+          "authorAssociation": "OWNER",
+          "body": "Could the Connect Stream be used for this (since it is 1:1 a session already and the lifetime is tied to that connect stream)? I guess we're already there a bit, but just resetting that stream loses the routing information you need to clean up, hence the need for something like GOAWAY, like you said. \ud83d\ude04 ",
+          "createdAt": "2020-07-26T02:40:44Z",
+          "updatedAt": "2020-07-26T02:40:55Z"
+        }
+      ]
+    }
+  ],
+  "pulls": [
+    {
+      "number": 1,
+      "id": "MDExOlB1bGxSZXF1ZXN0Mzg0NTM1NzMz",
+      "title": "Editorial changes",
+      "url": "https://github.com/ekinnear/draft-webtransport-http2/pull/1",
+      "state": "MERGED",
+      "author": "afrind",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "erickinnear"
+      ],
+      "labels": [],
+      "body": "",
+      "createdAt": "2020-03-05T22:37:18Z",
+      "updatedAt": "2020-03-09T23:41:28Z",
+      "baseRepository": "ekinnear/draft-webtransport-http2",
+      "baseRefName": "master",
+      "baseRefOid": "02b5b7408316e955cf0e3f9c7bc3e5485375d6fa",
+      "headRepository": "afrind/draft-webtransport-http2",
+      "headRefName": "editorial",
+      "headRefOid": "d6988dc2bb25b47355d3adc34f79a2a724c26242",
+      "closedAt": "2020-03-09T23:19:06Z",
+      "mergedAt": "2020-03-09T23:19:05Z",
+      "mergedBy": "erickinnear",
+      "mergeCommit": {
+        "oid": "e6c988bbcdb472d0e7c2271401df37429dbc0e47"
+      },
+      "comments": [
+        {
+          "author": "erickinnear",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Landing this now and applying subsequent comments directly to speed things up",
+          "createdAt": "2020-03-09T23:18:53Z",
+          "updatedAt": "2020-03-09T23:18:53Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3MzcwNTEwMTIz",
+          "commit": {
+            "abbreviatedOid": "d6988dc"
+          },
+          "author": "afrind",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "Leaving some inline comments here.  Maybe this wasn't the best mechanism, but here it is.",
+          "createdAt": "2020-03-06T17:46:51Z",
+          "updatedAt": "2020-03-06T18:01:28Z",
+          "comments": [
+            {
+              "originalPosition": 180,
+              "body": "I removed this normative text, but didn't add it elsewhere yet.  I think we're trying to define the legal frames on a WT stream, right?  I was thinking that might make more sense in a different section, rather than in the frame definition.",
+              "createdAt": "2020-03-06T17:46:51Z",
+              "updatedAt": "2020-03-06T18:01:28Z"
+            },
+            {
+              "originalPosition": 188,
+              "body": "The 0xfb frame is my second favorite after ACK_FREQUENCY (0xaf)",
+              "createdAt": "2020-03-06T17:47:26Z",
+              "updatedAt": "2020-03-06T18:01:28Z"
+            },
+            {
+              "originalPosition": 192,
+              "body": "I see you have a full state machine description in a section below, reference it here?",
+              "createdAt": "2020-03-06T17:48:07Z",
+              "updatedAt": "2020-03-06T18:01:28Z"
+            },
+            {
+              "originalPosition": 192,
+              "body": "Gah, GH won't let me add comments to sections of the file without changes.  Dropping a bunch of comments here (line numbers from this PR).\r\n\r\nLine 233: should we mention that including WTHEADERS frames when the peer has not fully negotiated WT will result in compression state getting screwed up?\r\n",
+              "createdAt": "2020-03-06T17:50:44Z",
+              "updatedAt": "2020-03-06T18:01:29Z"
+            },
+            {
+              "originalPosition": 192,
+              "body": "Line 265: Is the presence of WebSocket headers in a WT handshake an error?",
+              "createdAt": "2020-03-06T17:52:28Z",
+              "updatedAt": "2020-03-06T18:01:29Z"
+            },
+            {
+              "originalPosition": 192,
+              "body": "Line 273: \"semantics defined by that protocol\" : add a reference to the protocol mentioned here.",
+              "createdAt": "2020-03-06T17:53:23Z",
+              "updatedAt": "2020-03-06T18:01:29Z"
+            },
+            {
+              "originalPosition": 192,
+              "body": "Line 434: \"priorities and dependencies\": we probably need to update this to reflect the new HTTP priority scheme?  There's also a comment a couple lines later about not allowing dependencies across stream groups, but that doesn't even make sense anymore.",
+              "createdAt": "2020-03-06T17:55:04Z",
+              "updatedAt": "2020-03-06T18:01:29Z"
+            },
+            {
+              "originalPosition": 192,
+              "body": "Line 454: \"identically to their...\" - It's more than routing to the same destination, you must route on the same connection as the Connect Stream.",
+              "createdAt": "2020-03-06T17:56:30Z",
+              "updatedAt": "2020-03-06T18:01:29Z"
+            },
+            {
+              "originalPosition": 192,
+              "body": "Line 458: \"fail the extended...\" - Clients may be piggybacking WT Streams assuming the CONNECT handshake is going to succeed. These streams also need to be reset if the handshake fails.",
+              "createdAt": "2020-03-06T17:57:26Z",
+              "updatedAt": "2020-03-06T18:01:29Z"
+            },
+            {
+              "originalPosition": 192,
+              "body": "Line 494: \"reset all...\" - I think this conflicts with other language that treats graceful and ungraceful termination differently.",
+              "createdAt": "2020-03-06T18:00:36Z",
+              "updatedAt": "2020-03-06T18:01:29Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3MzcwNTE5NTM1",
+          "commit": {
+            "abbreviatedOid": "d6988dc"
+          },
+          "author": "afrind",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "Missed some other comments",
+          "createdAt": "2020-03-06T18:02:37Z",
+          "updatedAt": "2020-03-06T18:05:48Z",
+          "comments": [
+            {
+              "originalPosition": 1,
+              "body": "Line 384: \"best treated\" - maybe this should be a RECOMMENDED?",
+              "createdAt": "2020-03-06T18:02:37Z",
+              "updatedAt": "2020-03-06T18:05:48Z"
+            },
+            {
+              "originalPosition": 1,
+              "body": "Line 385: \"subsequent...\"  - What happens to open WT Streams?\r\n",
+              "createdAt": "2020-03-06T18:03:13Z",
+              "updatedAt": "2020-03-06T18:05:48Z"
+            },
+            {
+              "originalPosition": 1,
+              "body": "Line 394: \"MUST NOT send data\" - Should we say DATA frames with non-zero payload?\r\n",
+              "createdAt": "2020-03-06T18:03:48Z",
+              "updatedAt": "2020-03-06T18:05:48Z"
+            },
+            {
+              "originalPosition": 1,
+              "body": "Line 410: \"If the Connect Stream...\" - Isn't this different from what's in WT? Doesn't it say that everything is gone once the WT connect stream is gone?",
+              "createdAt": "2020-03-06T18:04:26Z",
+              "updatedAt": "2020-03-06T18:05:49Z"
+            },
+            {
+              "originalPosition": 1,
+              "body": "Line 415: \"SHOULD refresh...\" - Or perhaps, \"SHOULD take measures to prevent a peer or intermediary from timing out the Connect Stream\" ?",
+              "createdAt": "2020-03-06T18:05:27Z",
+              "updatedAt": "2020-03-06T18:05:49Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3MzcxNDgwMzM0",
+          "commit": {
+            "abbreviatedOid": "d6988dc"
+          },
+          "author": "erickinnear",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-03-09T19:49:41Z",
+          "updatedAt": "2020-03-09T19:49:41Z",
+          "comments": [
+            {
+              "originalPosition": 180,
+              "body": "Sounds great, I agree it's a little bit weird in that order. Perhaps we could move it later so the structure would be: \r\n- Negotiating Http2Transport, here's all the SETTINGS and such\r\n- Establishing WebTransport Streams, here's the WTHeaders frame and rules around that\r\n- Using WebTransport Streams, here's the additional rules about lifecycle and end of life for such streams",
+              "createdAt": "2020-03-09T19:49:41Z",
+              "updatedAt": "2020-03-09T19:49:41Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3MzcxNDgwODE5",
+          "commit": {
+            "abbreviatedOid": "d6988dc"
+          },
+          "author": "erickinnear",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-03-09T19:50:24Z",
+          "updatedAt": "2020-03-09T19:50:25Z",
+          "comments": [
+            {
+              "originalPosition": 192,
+              "body": "Yes please!",
+              "createdAt": "2020-03-09T19:50:24Z",
+              "updatedAt": "2020-03-09T19:50:25Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3MzcxNDgxMDAy",
+          "commit": {
+            "abbreviatedOid": "d6988dc"
+          },
+          "author": "erickinnear",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-03-09T19:50:41Z",
+          "updatedAt": "2020-03-09T19:50:41Z",
+          "comments": [
+            {
+              "originalPosition": 188,
+              "body": "Yeah, I left this as is for the moment, but should we change this to not a FB frame?",
+              "createdAt": "2020-03-09T19:50:41Z",
+              "updatedAt": "2020-03-09T19:50:41Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3MzcxNDgxNDU2",
+          "commit": {
+            "abbreviatedOid": "d6988dc"
+          },
+          "author": "erickinnear",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-03-09T19:51:22Z",
+          "updatedAt": "2020-03-09T19:51:22Z",
+          "comments": [
+            {
+              "originalPosition": 192,
+              "body": "Good idea \ud83d\udc4d",
+              "createdAt": "2020-03-09T19:51:22Z",
+              "updatedAt": "2020-03-09T19:51:22Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3MzcxNDgxNjI3",
+          "commit": {
+            "abbreviatedOid": "d6988dc"
+          },
+          "author": "erickinnear",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-03-09T19:51:40Z",
+          "updatedAt": "2020-03-09T19:51:40Z",
+          "comments": [
+            {
+              "originalPosition": 192,
+              "body": "In the spirit of being stricter, I'd say yes",
+              "createdAt": "2020-03-09T19:51:40Z",
+              "updatedAt": "2020-03-09T19:51:40Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3MzcxNTg5MzM4",
+          "commit": {
+            "abbreviatedOid": "d6988dc"
+          },
+          "author": "erickinnear",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "Looking great, thanks for cleaning a bunch of this up! ",
+          "createdAt": "2020-03-09T23:17:47Z",
+          "updatedAt": "2020-03-09T23:18:34Z",
+          "comments": [
+            {
+              "originalPosition": 120,
+              "body": "```suggestion\r\nWebTransport Connect Streams to a Http2Transport Server.  Http2Transport servers\r\n```",
+              "createdAt": "2020-03-09T23:17:47Z",
+              "updatedAt": "2020-03-09T23:18:34Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3MzcxNTk1OTIz",
+          "commit": {
+            "abbreviatedOid": "d6988dc"
+          },
+          "author": "erickinnear",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "Will file issues for the ones indicated, otherwise I made the suggested edits. Thanks for reviewing this, @afrind!",
+          "createdAt": "2020-03-09T23:37:25Z",
+          "updatedAt": "2020-03-09T23:41:28Z",
+          "comments": [
+            {
+              "originalPosition": 1,
+              "body": "Done",
+              "createdAt": "2020-03-09T23:37:26Z",
+              "updatedAt": "2020-03-09T23:41:28Z"
+            },
+            {
+              "originalPosition": 1,
+              "body": "Needs an issue, we can either let them wrap up or close immediately, tempted to say the latter",
+              "createdAt": "2020-03-09T23:38:03Z",
+              "updatedAt": "2020-03-09T23:41:28Z"
+            },
+            {
+              "originalPosition": 1,
+              "body": "Done",
+              "createdAt": "2020-03-09T23:38:35Z",
+              "updatedAt": "2020-03-09T23:41:28Z"
+            },
+            {
+              "originalPosition": 1,
+              "body": "Yup, will put the in the issue above, good catch",
+              "createdAt": "2020-03-09T23:39:03Z",
+              "updatedAt": "2020-03-09T23:41:28Z"
+            },
+            {
+              "originalPosition": 1,
+              "body": "Nice! Added",
+              "createdAt": "2020-03-09T23:39:30Z",
+              "updatedAt": "2020-03-09T23:41:28Z"
+            },
+            {
+              "originalPosition": 180,
+              "body": "Put it back in the new spot for now, we can move around later",
+              "createdAt": "2020-03-09T23:39:42Z",
+              "updatedAt": "2020-03-09T23:41:28Z"
+            },
+            {
+              "originalPosition": 192,
+              "body": "Done",
+              "createdAt": "2020-03-09T23:39:49Z",
+              "updatedAt": "2020-03-09T23:41:28Z"
+            },
+            {
+              "originalPosition": 192,
+              "body": "Needs an issue, didn't do this yet",
+              "createdAt": "2020-03-09T23:39:59Z",
+              "updatedAt": "2020-03-09T23:41:28Z"
+            },
+            {
+              "originalPosition": 192,
+              "body": "Needs issue, didn't do this yet",
+              "createdAt": "2020-03-09T23:40:04Z",
+              "updatedAt": "2020-03-09T23:41:28Z"
+            },
+            {
+              "originalPosition": 192,
+              "body": "Needs issue to follow up",
+              "createdAt": "2020-03-09T23:40:13Z",
+              "updatedAt": "2020-03-09T23:41:28Z"
+            },
+            {
+              "originalPosition": 192,
+              "body": "Removed some, but still would be good to have an issue tracking a complete scrub",
+              "createdAt": "2020-03-09T23:40:28Z",
+              "updatedAt": "2020-03-09T23:41:28Z"
+            },
+            {
+              "originalPosition": 192,
+              "body": "Changed",
+              "createdAt": "2020-03-09T23:40:33Z",
+              "updatedAt": "2020-03-09T23:41:28Z"
+            },
+            {
+              "originalPosition": 192,
+              "body": "Added",
+              "createdAt": "2020-03-09T23:40:40Z",
+              "updatedAt": "2020-03-09T23:41:28Z"
+            },
+            {
+              "originalPosition": 192,
+              "body": "Let's tackle that in an issue I think we require both behaviors in different places and that can't be right :) ",
+              "createdAt": "2020-03-09T23:41:01Z",
+              "updatedAt": "2020-03-09T23:41:28Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "id": "MDExOlB1bGxSZXF1ZXN0Mzg1ODY4NjA5",
+      "title": "Great suggestions by @afrind",
+      "url": "https://github.com/ekinnear/draft-webtransport-http2/pull/2",
+      "state": "MERGED",
+      "author": "erickinnear",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2020-03-09T23:42:23Z",
+      "updatedAt": "2020-03-09T23:45:08Z",
+      "baseRepository": "ekinnear/draft-webtransport-http2",
+      "baseRefName": "master",
+      "baseRefOid": "e6c988bbcdb472d0e7c2271401df37429dbc0e47",
+      "headRepository": "ekinnear/draft-webtransport-http2",
+      "headRefName": "ek/reorganize_and_editorial",
+      "headRefOid": "97542cc94f6bce585d83e22b42511f20b6ebd1f0",
+      "closedAt": "2020-03-09T23:45:02Z",
+      "mergedAt": "2020-03-09T23:45:02Z",
+      "mergedBy": "erickinnear",
+      "mergeCommit": {
+        "oid": "8f02a1f3f806b42cad80bc0964c22c429ed748b9"
+      },
+      "comments": [
+        {
+          "author": "erickinnear",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Merging so we can upload, please do leave any comments if you find some and/or file issues!",
+          "createdAt": "2020-03-09T23:44:55Z",
+          "updatedAt": "2020-03-09T23:44:55Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 9,
+      "id": "MDExOlB1bGxSZXF1ZXN0NDQ4NDg4Njk3",
+      "title": "Editorial changes and organization",
+      "url": "https://github.com/ekinnear/draft-webtransport-http2/pull/9",
+      "state": "MERGED",
+      "author": "ekinnear",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "ekinnear"
+      ],
+      "labels": [],
+      "body": "Move some text out of the introduction into the overview, fix a bunch of typos, and clean up some of the language to aid in clarity of upcoming sections of text.",
+      "createdAt": "2020-07-13T21:04:21Z",
+      "updatedAt": "2020-07-13T21:22:05Z",
+      "baseRepository": "ekinnear/draft-webtransport-http2",
+      "baseRefName": "master",
+      "baseRefOid": "d9e4640cdd12b262aea651dbf80a8ec440960fd6",
+      "headRepository": "ekinnear/draft-webtransport-http2",
+      "headRefName": "ek/rev_feedback",
+      "headRefOid": "1058981ac2d0f94236c58782b49f31319f58c4cc",
+      "closedAt": "2020-07-13T21:22:05Z",
+      "mergedAt": "2020-07-13T21:22:04Z",
+      "mergedBy": "ekinnear",
+      "mergeCommit": {
+        "oid": "fe600c2c8de64472402f3b0fdf18d12081723f8c"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NDQ3NjA5MDQ0",
+          "commit": {
+            "abbreviatedOid": "1058981"
+          },
+          "author": "afrind",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2020-07-13T21:18:43Z",
+          "updatedAt": "2020-07-13T21:18:43Z",
+          "comments": []
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NDQ3NjA5OTky",
+          "commit": {
+            "abbreviatedOid": "1058981"
+          },
+          "author": "DavidSchinazi",
+          "authorAssociation": "NONE",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2020-07-13T21:20:22Z",
+          "updatedAt": "2020-07-13T21:20:22Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "id": "MDExOlB1bGxSZXF1ZXN0NDQ4NTEzMTI2",
+      "title": "#8 Enumerate the transport properties provided by Http2Transport",
+      "url": "https://github.com/ekinnear/draft-webtransport-http2/pull/10",
+      "state": "MERGED",
+      "author": "ekinnear",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Add brief section describing Http2Transport's stance on the properties enumerated in the WebTransport Overview. \r\nWe can move this around later as necessary, but wanted to get the text in to document which optional properties are supported and which are not.\r\n\r\nCloses #8.",
+      "createdAt": "2020-07-13T21:44:57Z",
+      "updatedAt": "2020-07-13T22:45:26Z",
+      "baseRepository": "ekinnear/draft-webtransport-http2",
+      "baseRefName": "master",
+      "baseRefOid": "fe600c2c8de64472402f3b0fdf18d12081723f8c",
+      "headRepository": "ekinnear/draft-webtransport-http2",
+      "headRefName": "ek/transport_properties",
+      "headRefOid": "df81a40074fe8dbe9475b82445058d1948109e10",
+      "closedAt": "2020-07-13T22:45:26Z",
+      "mergedAt": "2020-07-13T22:45:26Z",
+      "mergedBy": "ekinnear",
+      "mergeCommit": {
+        "oid": "3242a06f1fdab9a6cf183947b94a849b3106b232"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NDQ3NjM0MDAy",
+          "commit": {
+            "abbreviatedOid": "16962ff"
+          },
+          "author": "afrind",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2020-07-13T21:47:39Z",
+          "updatedAt": "2020-07-13T21:47:39Z",
+          "comments": []
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NDQ3NjM1MjIx",
+          "commit": {
+            "abbreviatedOid": "16962ff"
+          },
+          "author": "DavidSchinazi",
+          "authorAssociation": "NONE",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2020-07-13T21:49:56Z",
+          "updatedAt": "2020-07-13T21:50:18Z",
+          "comments": [
+            {
+              "originalPosition": 9,
+              "body": "I would replace \"Http2Transport supports the following properties\" with something like \"Below are details about whether Http2Transport supports these properties\" ",
+              "createdAt": "2020-07-13T21:49:56Z",
+              "updatedAt": "2020-07-13T22:44:47Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NDQ3NjM1NzQ1",
+          "commit": {
+            "abbreviatedOid": "16962ff"
+          },
+          "author": "DavidSchinazi",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-07-13T21:50:52Z",
+          "updatedAt": "2020-07-13T21:50:52Z",
+          "comments": [
+            {
+              "originalPosition": 9,
+              "body": "(Because I find it odd to say we support properties and then say we don't)",
+              "createdAt": "2020-07-13T21:50:52Z",
+              "updatedAt": "2020-07-13T22:44:47Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NDQ3NjYxMzU4",
+          "commit": {
+            "abbreviatedOid": "16962ff"
+          },
+          "author": "ekinnear",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-07-13T22:43:29Z",
+          "updatedAt": "2020-07-13T22:43:30Z",
+          "comments": [
+            {
+              "originalPosition": 9,
+              "body": "Ah thank you, was looking for a way to say that -- was bothering me too.",
+              "createdAt": "2020-07-13T22:43:30Z",
+              "updatedAt": "2020-07-13T22:44:47Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NDQ3NjYyMDU4",
+          "commit": {
+            "abbreviatedOid": "df81a40"
+          },
+          "author": "ekinnear",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-07-13T22:45:06Z",
+          "updatedAt": "2020-07-13T22:45:07Z",
+          "comments": [
+            {
+              "originalPosition": 9,
+              "body": "Changed in df81a40",
+              "createdAt": "2020-07-13T22:45:06Z",
+              "updatedAt": "2020-07-13T22:45:07Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 13,
+      "id": "MDExOlB1bGxSZXF1ZXN0NTE4ODY0NzYx",
+      "title": "Add unidirectional flag to WTHEADERS",
+      "url": "https://github.com/ekinnear/draft-webtransport-http2/pull/13",
+      "state": "MERGED",
+      "author": "afrind",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Fixes: #5",
+      "createdAt": "2020-11-11T00:54:26Z",
+      "updatedAt": "2020-11-15T21:29:13Z",
+      "baseRepository": "ekinnear/draft-webtransport-http2",
+      "baseRefName": "master",
+      "baseRefOid": "3242a06f1fdab9a6cf183947b94a849b3106b232",
+      "headRepository": "afrind/draft-webtransport-http2",
+      "headRefName": "unidirectional-stream",
+      "headRefOid": "cd47d2d945ec0e64fabdc599b30608f80402b9c1",
+      "closedAt": "2020-11-15T21:29:13Z",
+      "mergedAt": "2020-11-15T21:29:13Z",
+      "mergedBy": "ekinnear",
+      "mergeCommit": {
+        "oid": "f3749705a5be9502e781f12fd5155b6af14d683b"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTMwNzY3Mjc0",
+          "commit": {
+            "abbreviatedOid": "5e49eb3"
+          },
+          "author": "ekinnear",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "Looking good! Few minor formatting nits, but nothing major.",
+          "createdAt": "2020-11-15T04:59:04Z",
+          "updatedAt": "2020-11-15T05:00:29Z",
+          "comments": [
+            {
+              "originalPosition": 12,
+              "body": "```suggestion\r\nThe WTHEADERS frame has an additional flag, Unidirectional (0x40).  When this flag\r\n```",
+              "createdAt": "2020-11-15T04:59:04Z",
+              "updatedAt": "2020-11-15T21:26:29Z"
+            },
+            {
+              "originalPosition": 13,
+              "body": "Small formatting nit, I think we're in single-space mode for this one :) \r\n```suggestion\r\nis present, the stream starts in a half-closed state. The sending endpoint\r\n```",
+              "createdAt": "2020-11-15T04:59:37Z",
+              "updatedAt": "2020-11-15T21:26:29Z"
+            },
+            {
+              "originalPosition": 14,
+              "body": "```suggestion\r\nstream state is \"half-closed (remote)\" and the receiving endpoint state is\r\n```",
+              "createdAt": "2020-11-15T04:59:47Z",
+              "updatedAt": "2020-11-15T21:26:29Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 14,
+      "id": "MDExOlB1bGxSZXF1ZXN0NTE4ODY2MDkw",
+      "title": "Add a section describing how the WT overview requirements are satisfied",
+      "url": "https://github.com/ekinnear/draft-webtransport-http2/pull/14",
+      "state": "CLOSED",
+      "author": "afrind",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "I tried stacking this PR on the previous commit (which also has a PR), but I'm not sure I did it correctly",
+      "createdAt": "2020-11-11T00:58:52Z",
+      "updatedAt": "2021-02-22T23:35:42Z",
+      "baseRepository": "ekinnear/draft-webtransport-http2",
+      "baseRefName": "master",
+      "baseRefOid": "3242a06f1fdab9a6cf183947b94a849b3106b232",
+      "headRepository": "afrind/draft-webtransport-http2",
+      "headRefName": "wt-req",
+      "headRefOid": "9127a05a989f6333e1dc5d8ba259c4dde23f452d",
+      "closedAt": "2021-02-22T23:04:42Z",
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "afrind",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Lol ok I totally didn't even read the issue, this definitely doesn't fix #4.",
+          "createdAt": "2020-11-11T01:13:08Z",
+          "updatedAt": "2020-11-11T01:13:08Z"
+        },
+        {
+          "author": "ekinnear",
+          "authorAssociation": "OWNER",
+          "body": "(Feel free to reopen if still relevant after H3-aligned rewrite, this was closed when transitioning default branch names)",
+          "createdAt": "2021-02-22T23:35:42Z",
+          "updatedAt": "2021-02-22T23:35:42Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTMwNzY3Njgw",
+          "commit": {
+            "abbreviatedOid": "9127a05"
+          },
+          "author": "ekinnear",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-11-15T05:11:11Z",
+          "updatedAt": "2020-11-15T05:11:55Z",
+          "comments": [
+            {
+              "originalPosition": 16,
+              "body": "Do we need this section still or is it getting picked up automatically by the latest version of the template?",
+              "createdAt": "2020-11-15T05:11:11Z",
+              "updatedAt": "2020-11-15T05:11:55Z"
+            },
+            {
+              "originalPosition": 44,
+              "body": "This is a good start, I like the mini-section for each feature describing how to accomplish it with h2transport!",
+              "createdAt": "2020-11-15T05:11:50Z",
+              "updatedAt": "2020-11-15T05:11:55Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTMwOTI0NzA3",
+          "commit": {
+            "abbreviatedOid": "9127a05"
+          },
+          "author": "afrind",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-11-16T05:22:13Z",
+          "updatedAt": "2020-11-16T05:22:13Z",
+          "comments": [
+            {
+              "originalPosition": 16,
+              "body": "I was getting build errors without it when I tried to reference [OVERVIEW]?",
+              "createdAt": "2020-11-16T05:22:13Z",
+              "updatedAt": "2020-11-16T05:22:13Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 15,
+      "id": "MDExOlB1bGxSZXF1ZXN0NTE4ODY5MzE3",
+      "title": "Allow WTHEADERS to have empty Header Block Fragment",
+      "url": "https://github.com/ekinnear/draft-webtransport-http2/pull/15",
+      "state": "CLOSED",
+      "author": "afrind",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "If the application doesn't wish to use HTTP/2 to convey structured metadata and take advantage of HPACK compression, it doesn't have to.  Note that in the simplest case then, a WTHEADERS frame is:\r\n\r\n```\r\n 0                   1                   2                   3\r\n 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1\r\n+-----------------------------------------------+\r\n|                 Length (24)                   |\r\n+---------------+---------------+---------------+\r\n|   Type (8)    |   Flags (8)   |\r\n+-+-------------+---------------+-------------------------------+\r\n|R|                 Stream Identifier (31)                      |\r\n+-+-------------+-----------------------------------------------+\r\n|R|                 Connect Stream ID (31)                      |\r\n+-+-------------+-----------------------------------------------+\r\n```",
+      "createdAt": "2020-11-11T01:09:09Z",
+      "updatedAt": "2021-02-22T23:35:37Z",
+      "baseRepository": "ekinnear/draft-webtransport-http2",
+      "baseRefName": "master",
+      "baseRefOid": "3242a06f1fdab9a6cf183947b94a849b3106b232",
+      "headRepository": "afrind/draft-webtransport-http2",
+      "headRefName": "headers-optional",
+      "headRefOid": "41733720c6c23608b4f5a34fa91af585aef860ab",
+      "closedAt": "2021-02-22T23:04:42Z",
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "ekinnear",
+          "authorAssociation": "OWNER",
+          "body": "(Feel free to reopen if still relevant after H3-aligned rewrite, this was closed when transitioning default branch names)",
+          "createdAt": "2021-02-22T23:35:37Z",
+          "updatedAt": "2021-02-22T23:35:37Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTMwNzY3NjQ2",
+          "commit": {
+            "abbreviatedOid": "4173372"
+          },
+          "author": "ekinnear",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-11-15T05:09:56Z",
+          "updatedAt": "2020-11-15T05:10:20Z",
+          "comments": [
+            {
+              "originalPosition": 6,
+              "body": "If we're going to not define additional semantics here, should we indicate that there needs to be a replacement field defined by an extension for it to be considered valid? Or put in place some other extension mechanism? \r\n\r\nIt seems like we jump into a whole additional layer of complexity by leaving it as an exercise for the implementor, is there a way to arrange this so it's very clear about what happens if you choose to leave it empty? \r\n\r\n(Having an empty WTHEADERS frame is totally reasonable and what we've actually implemented so far, so I'm not bothered by that, just want to be clear about what would happen if someone actually wanted to use \"structured\" metadata.)",
+              "createdAt": "2020-11-15T05:09:56Z",
+              "updatedAt": "2020-11-15T05:10:20Z"
+            },
+            {
+              "originalPosition": 5,
+              "body": "One space again :) \r\n```suggestion\r\nUnlike HEADERS, the Header Block Fragment field MAY be empty. There\r\nare no predefined semantics of the fields in the decoded block. The\r\n```",
+              "createdAt": "2020-11-15T05:10:16Z",
+              "updatedAt": "2020-11-15T05:10:20Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTMwOTI0MzEz",
+          "commit": {
+            "abbreviatedOid": "4173372"
+          },
+          "author": "afrind",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-11-16T05:20:34Z",
+          "updatedAt": "2020-11-16T05:20:35Z",
+          "comments": [
+            {
+              "originalPosition": 6,
+              "body": "Of course if two implementations (client/server) want to interoperate, they need to agree on the semantics of the fields.  But they also need to agree on the content of the streams and/or datagrams, so I'm not sure it's totally different.  \r\n\r\nDoes the CONNECT handshake otherwise allow endpoints to negotiate what the semantics are for the WT session?\r\n\r\nMaybe I can make it explicit in this PR:\r\n\r\n```\r\nThere are no predefined semantics of the fields in the decoded block.  Applications can use it to convey \r\narbitrary structured metadata.  Applications utilizing the header block SHOULD negotiate the semantics \r\nof the fields in the same manner they negotiate the content of streams or datagrams.\r\n```",
+              "createdAt": "2020-11-16T05:20:34Z",
+              "updatedAt": "2020-11-16T05:20:57Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 16,
+      "id": "MDExOlB1bGxSZXF1ZXN0NTc2MDU1MjA1",
+      "title": "Total rewrite based on draft-ietf-webtransport-http3",
+      "url": "https://github.com/ekinnear/draft-webtransport-http2/pull/16",
+      "state": "MERGED",
+      "author": "afrind",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2021-02-18T23:05:44Z",
+      "updatedAt": "2021-02-22T22:07:50Z",
+      "baseRepository": "ekinnear/draft-webtransport-http2",
+      "baseRefName": "master",
+      "baseRefOid": "f3749705a5be9502e781f12fd5155b6af14d683b",
+      "headRepository": "afrind/draft-webtransport-http2",
+      "headRefName": "rewrite",
+      "headRefOid": "eacaed156408e3036a1951c0cb9bb2b1559ad5c1",
+      "closedAt": "2021-02-22T22:07:50Z",
+      "mergedAt": "2021-02-22T22:07:50Z",
+      "mergedBy": "ekinnear",
+      "mergeCommit": {
+        "oid": "a40e50b448fe72dc8336fe4f118781d2380247bd"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTkzNzI2OTMw",
+          "commit": {
+            "abbreviatedOid": "3218156"
+          },
+          "author": "afrind",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2021-02-18T23:06:18Z",
+          "updatedAt": "2021-02-18T23:06:56Z",
+          "comments": [
+            {
+              "originalPosition": 23,
+              "body": "This isn't generating links for me, not sure what I did wrong.",
+              "createdAt": "2021-02-18T23:06:18Z",
+              "updatedAt": "2021-02-22T22:03:17Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTkzNzMyMTU3",
+          "commit": {
+            "abbreviatedOid": "3218156"
+          },
+          "author": "ekinnear",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "Wow, thank you for doing this! Mostly just textual nits, nothing major.",
+          "createdAt": "2021-02-18T23:16:11Z",
+          "updatedAt": "2021-02-22T21:30:59Z",
+          "comments": [
+            {
+              "originalPosition": 55,
+              "body": "This probably wants to be either \r\n```suggestion\r\n\\<https://github.com/ekinnear/draft-webtransport-http2/issues\\>.  The\r\n```\r\nor\r\n```suggestion\r\n\\<https://github.com/ietf-wg-webtrans/draft-ietf-webtrans-http2/issues\\>.  The\r\n```\r\n",
+              "createdAt": "2021-02-18T23:16:11Z",
+              "updatedAt": "2021-02-22T22:03:17Z"
+            },
+            {
+              "originalPosition": 102,
+              "body": "There's probably room to keep a paragraph or two on why HTTP/2, the bits on what's out there, etc. as things that don't apply to H3 but are probably good to establish for H2?",
+              "createdAt": "2021-02-18T23:17:23Z",
+              "updatedAt": "2021-02-22T22:03:17Z"
+            },
+            {
+              "originalPosition": 41,
+              "body": "Style nit (throughout): Been using single spaces after sentences -- do we want to switch entirely to two or stick with one?",
+              "createdAt": "2021-02-18T23:18:04Z",
+              "updatedAt": "2021-02-22T22:03:17Z"
+            },
+            {
+              "originalPosition": 152,
+              "body": "```suggestion\r\nWebTransport servers are identified by a pair of authority value and\r\n```",
+              "createdAt": "2021-02-22T21:22:48Z",
+              "updatedAt": "2021-02-22T22:03:17Z"
+            },
+            {
+              "originalPosition": 180,
+              "body": "```suggestion\r\n* A datagram can be sent using a new HTTP/2 extension frame WT_DATAGRAM.\r\n```",
+              "createdAt": "2021-02-22T21:23:40Z",
+              "updatedAt": "2021-02-22T22:03:17Z"
+            },
+            {
+              "originalPosition": 183,
+              "body": "```suggestion\r\nA WebTransport session is terminated when the CONNECT stream that created it\r\n```",
+              "createdAt": "2021-02-22T21:23:50Z",
+              "updatedAt": "2021-02-22T22:03:17Z"
+            },
+            {
+              "originalPosition": 214,
+              "body": "That's kind of an interesting fallout from this, but seems fine",
+              "createdAt": "2021-02-22T21:24:30Z",
+              "updatedAt": "2021-02-22T22:03:17Z"
+            },
+            {
+              "originalPosition": 231,
+              "body": "Previously, this document registered that value. If that's now in WT over HTTP/3, we probably should reference that here?",
+              "createdAt": "2021-02-22T21:25:08Z",
+              "updatedAt": "2021-02-22T22:03:17Z"
+            },
+            {
+              "originalPosition": 462,
+              "body": "```suggestion\r\n{: #fig-wt_datagram title=\"WT_DATAGRAM Frame Format\"}\r\n```",
+              "createdAt": "2021-02-22T21:27:20Z",
+              "updatedAt": "2021-02-22T22:03:17Z"
+            },
+            {
+              "originalPosition": 511,
+              "body": "Does this part stay here even for datagrams?",
+              "createdAt": "2021-02-22T21:28:03Z",
+              "updatedAt": "2021-02-22T22:03:17Z"
+            },
+            {
+              "originalPosition": 523,
+              "body": "Probably worth filing an issue to either reference the appropriate text or just import it about how endpoints should be careful about what they throw out",
+              "createdAt": "2021-02-22T21:28:39Z",
+              "updatedAt": "2021-02-22T22:03:17Z"
+            },
+            {
+              "originalPosition": 535,
+              "body": "Can we move this to an issue and keep it out of the ID?\r\n```suggestion\r\n```",
+              "createdAt": "2021-02-22T21:29:15Z",
+              "updatedAt": "2021-02-22T22:03:17Z"
+            },
+            {
+              "originalPosition": 956,
+              "body": "Same, let's just make an issue\r\n```suggestion\r\n```",
+              "createdAt": "2021-02-22T21:30:44Z",
+              "updatedAt": "2021-02-22T22:03:17Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTk1ODAzNjk4",
+          "commit": {
+            "abbreviatedOid": "3218156"
+          },
+          "author": "afrind",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2021-02-22T21:34:55Z",
+          "updatedAt": "2021-02-22T21:42:41Z",
+          "comments": [
+            {
+              "originalPosition": 41,
+              "body": "I copied straight from the h3 draft.  Let's keep diffs to a minimum and address it in both places.",
+              "createdAt": "2021-02-22T21:34:55Z",
+              "updatedAt": "2021-02-22T22:03:17Z"
+            },
+            {
+              "originalPosition": 102,
+              "body": "Ok, I'll add a little bit back.  Since I killed the Field Section/Header block in this update, some of the second paragraph is moot.",
+              "createdAt": "2021-02-22T21:37:04Z",
+              "updatedAt": "2021-02-22T22:03:17Z"
+            },
+            {
+              "originalPosition": 152,
+              "body": "This came from h3, but sure.",
+              "createdAt": "2021-02-22T21:37:33Z",
+              "updatedAt": "2021-02-22T22:03:17Z"
+            },
+            {
+              "originalPosition": 183,
+              "body": "Also h3",
+              "createdAt": "2021-02-22T21:37:52Z",
+              "updatedAt": "2021-02-22T22:03:17Z"
+            },
+            {
+              "originalPosition": 214,
+              "body": "Yeah, the h3 draft does this, but maybe makes more sense there because the extended CONNECT isn't defined in any specification for h3 yet.",
+              "createdAt": "2021-02-22T21:38:43Z",
+              "updatedAt": "2021-02-22T22:03:17Z"
+            },
+            {
+              "originalPosition": 511,
+              "body": "oops",
+              "createdAt": "2021-02-22T21:40:59Z",
+              "updatedAt": "2021-02-22T22:03:17Z"
+            },
+            {
+              "originalPosition": 523,
+              "body": "Where is that text now?",
+              "createdAt": "2021-02-22T21:41:28Z",
+              "updatedAt": "2021-02-22T22:03:17Z"
+            },
+            {
+              "originalPosition": 535,
+              "body": "Also came from h3, but will remove from here.",
+              "createdAt": "2021-02-22T21:41:53Z",
+              "updatedAt": "2021-02-22T22:03:17Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTk1ODE3MTk4",
+          "commit": {
+            "abbreviatedOid": "a9195b0"
+          },
+          "author": "ekinnear",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2021-02-22T21:52:26Z",
+          "updatedAt": "2021-02-22T21:52:27Z",
+          "comments": [
+            {
+              "originalPosition": 523,
+              "body": "Potentially in QUIC datagram or H3 datagram itself. Let's just make an issue for this one at the moment and we can dig it up later",
+              "createdAt": "2021-02-22T21:52:26Z",
+              "updatedAt": "2021-02-22T22:03:17Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTk1ODE3NjQw",
+          "commit": {
+            "abbreviatedOid": "a9195b0"
+          },
+          "author": "ekinnear",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2021-02-22T21:53:03Z",
+          "updatedAt": "2021-02-22T21:53:04Z",
+          "comments": [
+            {
+              "originalPosition": 152,
+              "body": ":)",
+              "createdAt": "2021-02-22T21:53:04Z",
+              "updatedAt": "2021-02-22T22:03:17Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
